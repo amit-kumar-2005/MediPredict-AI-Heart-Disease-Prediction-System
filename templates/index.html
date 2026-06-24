@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MediPredict AI</title>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 70%;
+            max-width: 900px;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(15px);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            color: white;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-size: 13px;
+            margin-bottom: 3px;
+        }
+
+        small {
+            font-size: 11px;
+            opacity: 0.8;
+        }
+
+        input, select {
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 20px;
+            background: linear-gradient(45deg, #ff7b00, #ff3d00);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 12px;
+            background: white;
+            color: black;
+            text-align: center;
+        }
+
+        .high { color: red; font-weight: bold; }
+        .low { color: green; font-weight: bold; }
+
+        .disclaimer {
+            margin-top: 15px;
+            text-align: center;
+            font-size: 12px;
+            opacity: 0.85;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <!-- ✅ HEADING UPDATED -->
+    <h1>MediPredict AI: Heart Disease Prediction System ❤️</h1>
+
+    <form id="predictionForm">
+        <div class="grid">
+
+            <div class="field">
+                <label>Age</label>
+                <input type="number" id="age" placeholder="e.g. 45">
+                <small>Range: 20–80</small>
+            </div>
+
+            <div class="field">
+                <label>Gender</label>
+                <select id="sex">
+                    <option value="">Select</option>
+                    <option value="1">Male</option>
+                    <option value="0">Female</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>Chest Pain Type</label>
+                <select id="cp">
+                    <option value="">Select</option>
+                    <option value="0">Typical</option>
+                    <option value="1">Atypical</option>
+                    <option value="2">Non-anginal</option>
+                    <option value="3">Asymptomatic</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>Blood Pressure</label>
+                <input type="number" id="trestbps" placeholder="120">
+            </div>
+
+            <div class="field">
+                <label>Cholesterol</label>
+                <input type="number" id="chol" placeholder="200">
+            </div>
+
+            <div class="field">
+                <label>Fasting Blood Sugar</label>
+                <select id="fbs">
+                    <option value="">Select</option>
+                    <option value="1">True</option>
+                    <option value="0">False</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>ECG Result</label>
+                <select id="restecg">
+                    <option value="">Select</option>
+                    <option value="0">Normal</option>
+                    <option value="1">Abnormal</option>
+                    <option value="2">Hypertrophy</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>Max Heart Rate</label>
+                <input type="number" id="thalach" placeholder="150">
+            </div>
+
+            <div class="field">
+                <label>Exercise Angina</label>
+                <select id="exang">
+                    <option value="">Select</option>
+                    <option value="1">Yes</option>
+                    <option value="0">No</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>Oldpeak</label>
+                <input type="number" step="any" id="oldpeak" placeholder="1.2">
+            </div>
+
+            <div class="field">
+                <label>Slope</label>
+                <select id="slope">
+                    <option value="">Select</option>
+                    <option value="0">Upsloping</option>
+                    <option value="1">Flat</option>
+                    <option value="2">Downsloping</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>CA (0–3)</label>
+                <input type="number" id="ca" placeholder="0–3">
+            </div>
+
+            <div class="field">
+                <label>Thal</label>
+                <select id="thal">
+                    <option value="">Select</option>
+                    <option value="1">Normal</option>
+                    <option value="2">Fixed Defect</option>
+                    <option value="3">Reversible Defect</option>
+                </select>
+            </div>
+
+        </div>
+
+        <button type="submit">Predict</button>
+    </form>
+
+    <div id="result"></div>
+
+    <div class="disclaimer">
+        ⚠️ This system is for educational purposes only and not a substitute for medical advice.
+    </div>
+
+</div>
+
+<script>
+document.getElementById("predictionForm").addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    const inputs = document.querySelectorAll("input, select");
+    for (let input of inputs) {
+        if (input.value === "") {
+            alert("Please fill all fields!");
+            return;
+        }
+    }
+
+    const data = {
+        age: Number(age.value),
+        sex: Number(sex.value),
+        cp: Number(cp.value),
+        trestbps: Number(trestbps.value),
+        chol: Number(chol.value),
+        fbs: Number(fbs.value),
+        restecg: Number(restecg.value),
+        thalach: Number(thalach.value),
+        exang: Number(exang.value),
+        oldpeak: Number(oldpeak.value),
+        slope: Number(slope.value),
+        ca: Number(ca.value),
+        thal: Number(thal.value)
+        
+    };
+
+    const res = await fetch("/predict", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(data)
+    });
+
+    const result = await res.json();
+
+    let riskClass = result.risk === "High Risk" ? "high" : "low";
+
+    document.getElementById("result").innerHTML =
+        `<div class="result">
+            <h3>${result.prediction === 1 ? "⚠️ Disease Detected" : "✅ No Disease"}</h3>
+            <p>Probability: ${result.probability}%</p>
+            <p class="${riskClass}">${result.risk}</p>
+        </div>`;
+});
+</script>
+
+</body>
+</html>`
